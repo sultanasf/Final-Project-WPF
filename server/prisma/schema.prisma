@@ -1,0 +1,64 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Anggota {
+  id         Int          @id @default(autoincrement())
+  nama       String
+  email      String       @unique
+  password   String
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  deletedAt  DateTime?
+  Peminjaman Peminjaman[]
+}
+
+model Petugas {
+  id         Int          @id @default(autoincrement())
+  nama       String
+  email      String       @unique
+  password   String
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  deletedAt  DateTime?
+  Peminjaman Peminjaman[]
+}
+
+model Buku {
+  id               Int                @id @default(autoincrement())
+  judul            String
+  pengarang        String
+  penerbit         String
+  tahun            Int
+  siapPinjam       Boolean            @default(true)
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  deletedAt        DateTime?
+  DetailPeminjaman DetailPeminjaman[]
+}
+
+model Peminjaman {
+  id             Int       @id @default(autoincrement())
+  anggotaId      Int
+  petugasId      Int
+  tanggalPinjam  DateTime  @default(now())
+  tanggalKembali DateTime?
+
+  Anggota          Anggota            @relation(fields: [anggotaId], references: [id])
+  Petugas          Petugas            @relation(fields: [petugasId], references: [id])
+  DetailPeminjaman DetailPeminjaman[]
+}
+
+model DetailPeminjaman {
+  id           Int @id @default(autoincrement())
+  peminjamanId Int
+  bukuId       Int
+
+  Peminjaman Peminjaman @relation(fields: [peminjamanId], references: [id])
+  Buku       Buku       @relation(fields: [bukuId], references: [id], onDelete: Cascade)
+}
